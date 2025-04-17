@@ -17,7 +17,7 @@
 git clone https://github.com/DoumSof99/Obtain_25_Cat_Images.git
 cd Obtain_25_Cat_Images
 ```
-### 2. Start SQL Server with Docker
+### 2. Start SQL Server with Docker Container
 - Ensure Docker is running, then from the project root (where docker-compose.yml is), run:
 ```bash
 docker compose up -d
@@ -28,4 +28,10 @@ Server: localhost,1433
 User: sa  
 Password: Password1!
 ```
-
+### 3. Apply Database Migrations
+- In Visual Studio, use the .NET CLI to apply EF Core migrations and create the schema:
+```bash
+- dotnet build
+- dotnet ef database update
+```
+:globe_with_meridians: _This creates a database named **CatDb** with the required tables._
