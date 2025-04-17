@@ -1,0 +1,6 @@
+@Obtain_25_Cat_Images_HostAddress = http://localhost:5072
+
+GET {{Obtain_25_Cat_Images_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
