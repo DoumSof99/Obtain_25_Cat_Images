@@ -7,6 +7,6 @@ namespace Obtain_25_Cat_Images.Models.Entities {
         public string Image { get; set; } = string.Empty; //store the image URL rather than saving byte[] to the database
         public DateTime Created { get; set; } = DateTime.UtcNow;
 
-        public ICollection<CatTagEntity> CatTags { get; set; } = new List<CatTagEntity>();
+        public ICollection<CatTagEntity> CatTags { get; set; } = [];
     }
 }
