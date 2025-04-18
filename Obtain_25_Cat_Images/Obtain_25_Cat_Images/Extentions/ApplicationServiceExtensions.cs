@@ -16,6 +16,7 @@ namespace Obtain_25_Cat_Images.Extentions {
             services.AddHttpClient(); 
            
             services.AddScoped<ICatService, CatService>();
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             return services;
         }
