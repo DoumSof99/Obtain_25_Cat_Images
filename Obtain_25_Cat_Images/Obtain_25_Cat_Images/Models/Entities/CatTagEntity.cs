@@ -4,6 +4,6 @@
         public CatEntity Cat { get; set; } = null!;
 
         public int TagId { get; set; }
-        public TagEntity Tag { get; set; } = null!; // this will be set by EF Core not null
+        public TagEntity Tag { get; set; } = null!; 
     }
 }

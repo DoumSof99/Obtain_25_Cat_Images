@@ -14,7 +14,7 @@ namespace Obtain_25_Cat_Images.Services {
         
         public async Task<Result<List<CatResponseDTO>>> FetchAndSaveCatsAsync() {
             try {
-                string url = "https://api.thecatapi.com/v1/images/search?limit=25&has_breeds=1"; // this should be registered in IServiceCollection
+                string url = "https://api.thecatapi.com/v1/images/search?limit=25&has_breeds=1"; // this can be registered in IServiceCollection with api key
                 var response =  await httpClient.GetFromJsonAsync<List<CatApiResponseDTO>>(url);
 
                 if (response == null || response.Count == 0) {
