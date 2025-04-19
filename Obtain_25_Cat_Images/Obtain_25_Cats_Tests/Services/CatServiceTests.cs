@@ -142,7 +142,7 @@ namespace Obtain_25_Cats_Tests.Services {
         }
 
         [Fact]
-        public async Task FFetchAndSaveCatsAsync_Should_Have_Tags_With_Empty_Name() {
+        public async Task FetchAndSaveCatsAsync_Should_Have_Tags_With_Empty_Name() {
             var db = GetInMemoryDbContext();
             var fakeApiCats = new List<CatApiResponseDTO>
             {
