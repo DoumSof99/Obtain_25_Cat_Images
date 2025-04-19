@@ -35,3 +35,11 @@ Password: Password1!
 - dotnet ef database update
 ```
 :globe_with_meridians: _This creates a database named **CatDb** with the required tables._
+### 4. Add Your TheCatAPI Key
+- In the CLI of Visual Studio, _cd_ to the path that the file _appsettings.Development.template.json_ exists and run:
+```bash
+cp .\appsettings.Development.template.json .\appsettings.Development.json
+```
+1. A new file will be generated: _appsettings.Development.json_
+2. Then visit the site: _https://developers.thecatapi.com/view-account/ylX4blBYT9FaoVd6OhvR?report=FJkYOq9tW_
+3. Follow steps 1 and 2. Then copy your _ApiKey_ and place it in the _appsettings.Development.json_, where it says **<YOUR_API_KEY>**
