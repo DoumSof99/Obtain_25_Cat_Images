@@ -43,3 +43,10 @@ cp .\appsettings.Development.template.json .\appsettings.Development.json
 1. A new file will be generated: _appsettings.Development.json_
 2. Then visit the site: _https://developers.thecatapi.com/view-account/ylX4blBYT9FaoVd6OhvR?report=FJkYOq9tW_
 3. Follow steps 1 and 2. Then copy your _ApiKey_ and place it in the _appsettings.Development.json_, where it says **<YOUR_API_KEY>**
+### 5. Run the Web API
+- Make sure you're inside the root of the project _(where .csproj and Program.cs are)_, then run:
+```bash
+dotnet run
+```
+- This will start the Web API. Once the app is running, open your browser and navigate to: **_http://localhost:<your_port>/swagger_**
+- Example: If it says Now listening on _http://localhost:5072_, go to: _http://localhost:5072/swagger_
