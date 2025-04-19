@@ -13,9 +13,12 @@ namespace Obtain_25_Cat_Images.Extentions {
             services.AddSwaggerGen();
             services.AddDbContext<AppDbContext>(o => 
                 o.UseSqlServer(config.GetConnectionString("DefaultConnections")));
-            services.AddHttpClient(); 
+            services.AddHttpClient<ICatService, CatService>("TheCatApi", client => {
+                client.BaseAddress = new Uri("https://api.thecatapi.com/v1/");
+                client.DefaultRequestHeaders.Add("x-api-key", config["TheCatApi:ApiKey"]);
+            }); 
            
-            services.AddScoped<ICatService, CatService>();
+            // services.AddScoped<ICatService, CatService>();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             return services;

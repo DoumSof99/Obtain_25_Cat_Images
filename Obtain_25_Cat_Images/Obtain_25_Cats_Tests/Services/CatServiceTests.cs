@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Azure;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -8,13 +7,9 @@ using Obtain_25_Cat_Images.Data;
 using Obtain_25_Cat_Images.DTOs;
 using Obtain_25_Cat_Images.Models.Entities;
 using Obtain_25_Cat_Images.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Obtain_25_Cats_Tests.Services {
     public class CatServiceTests {
@@ -46,7 +41,7 @@ namespace Obtain_25_Cats_Tests.Services {
                     ItExpr.IsAny<HttpRequestMessage>(),
                     ItExpr.IsAny<CancellationToken>())
                 .ReturnsAsync(new HttpResponseMessage {
-                    StatusCode = System.Net.HttpStatusCode.OK,
+                    StatusCode = HttpStatusCode.OK,
                     Content = new StringContent(json, Encoding.UTF8, "application/json")
                 });
 
