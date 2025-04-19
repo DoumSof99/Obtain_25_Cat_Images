@@ -59,7 +59,7 @@ namespace Obtain_25_Cats_Tests.Services {
         #region Tests for FetchAndSaveCatsAsync()
 
         [Fact]
-        public async Task Valid_Save_Cats_And_Tags() {
+        public async Task FetchAndSaveCatsAsync_Valid_Save_Cats_And_Tags() {
             var db = GetInMemoryDbContext();
             var mockApiCats = new List<CatApiResponseDTO> {
                 new() {
@@ -110,7 +110,7 @@ namespace Obtain_25_Cats_Tests.Services {
         }
 
         [Fact]
-        public async Task Should_Ignore_Duplicates_Cats() {
+        public async Task FetchAndSaveCatsAsync_Should_Ignore_Duplicates_Cats() {
             var db = GetInMemoryDbContext();
             db.Cats.Add(new CatEntity { Id = 1, CatId = "CatId1", Image = "image234.jpg", Width = 300, Height = 120 });
             db.SaveChanges();
@@ -128,7 +128,7 @@ namespace Obtain_25_Cats_Tests.Services {
         }
 
         [Fact]
-        public async Task Fetch_Should_Fail_If_Response_Is_Null() {
+        public async Task FetchAndSaveCatsAsync_Should_Fail_If_Response_Is_Null() {
 
             var db = GetInMemoryDbContext();
            
@@ -141,7 +141,7 @@ namespace Obtain_25_Cats_Tests.Services {
         }
 
         [Fact]
-        public async Task Fetch_Cats_Should_Have_Tags_With_Empty_Name() {
+        public async Task FFetchAndSaveCatsAsync_Should_Have_Tags_With_Empty_Name() {
             var db = GetInMemoryDbContext();
             var fakeApiCats = new List<CatApiResponseDTO>
             {
@@ -163,6 +163,54 @@ namespace Obtain_25_Cats_Tests.Services {
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().NotBeNull();
             result.Value.Single().Tags.Should().BeEmpty();
+        }
+        #endregion
+
+        #region GetCatByIdAsync()
+
+        [Fact]
+        public async Task GetCatByIdAsync_Cat_Exists_Should_Return_DTO() {
+
+            var db = GetInMemoryDbContext();
+            var cat = new CatEntity {
+                Id = 1,
+                CatId = "Cat01",
+                Width = 400,
+                Height = 300,
+                Image = "https://piccat12332.jpg",
+                CatTags = [
+                        new() {
+                            Tag = new TagEntity { Name = "Playful" }
+                        },
+                        new() {
+                            Tag = new TagEntity { Name = "Independent" }
+                        }
+                    ]
+            };
+            db.Cats.Add(cat);
+            await db.SaveChangesAsync();
+
+            var service = new CatService(db, _mapper, new HttpClient());
+
+            var result = await service.GetCatByIdAsync(1);
+
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Id.Should().Be("Cat01");
+            result.Value.Image.Should().Be("https://piccat12332.jpg");
+            result.Value.Tags.Select(t => t.Name).Should().Contain("Playful");
+            result.Value.Tags.Select(t => t.Name).Should().BeEquivalentTo("Playful", "Independent");
+        }
+
+        [Fact]
+        public async Task GetCatByIdAsync_Cat_Not_Exist_Should_Fail() {
+            
+            var db = GetInMemoryDbContext();
+            var service = new CatService(db, _mapper, new HttpClient());
+
+            var result = await service.GetCatByIdAsync(1); 
+
+            result.IsFailed.Should().BeTrue();
+            result.Errors.Should().Contain(e => e.Message.Equals("Cat not found"));
         }
 
 
