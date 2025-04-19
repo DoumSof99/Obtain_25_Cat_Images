@@ -63,7 +63,7 @@ namespace Obtain_25_Cats_Tests.Services {
                     Url = "https://cdn2.thecatapi.com/images/0XYvRd7oD.jpg",
                     Width = 800,
                     Height = 200,
-                    Breads = [
+                    Breeds = [
                         new() {
                             Temperament = "Active, Energetic, Independent"
                         }
@@ -74,7 +74,7 @@ namespace Obtain_25_Cats_Tests.Services {
                     Url = "https://cdn2.thecatapi.com/images/5rYSrf3.jpg",
                     Width = 500,
                     Height = 150,
-                    Breads = [
+                    Breeds = [
                         new() {
                             Temperament = "Intelligent, Gentle"
                         }
@@ -147,7 +147,7 @@ namespace Obtain_25_Cats_Tests.Services {
                     Url = "img.jpg",
                     Width = 300,
                     Height = 300,
-                    Breads = [new() { Temperament = "" }]
+                    Breeds = [new() { Temperament = "" }]
                 }
             };
 

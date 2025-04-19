@@ -22,7 +22,11 @@ namespace Obtain_25_Cat_Images.Services {
                     return Result.Fail("There was an error fetching cats.");
                 }
 
+                var existingTags = await context.Tags.ToListAsync();
+                var tagsDict = existingTags.ToDictionary(t => t.Name.ToLower(), t => t);
+
                 var catEntityList = new List<CatEntity>();
+
                 foreach (var cat in response) {
                     if (context.Cats.Any(c => c.CatId == cat.Id)) continue;
 
@@ -34,17 +38,20 @@ namespace Obtain_25_Cat_Images.Services {
                         CatTags = []
                     };
 
-                    var tags = cat.Breads
+                    var tags = cat.Breeds
                         .SelectMany(p => Parser.ParseTemperament(p.Temperament))
+                        .Select(t => t.Trim())
+                        .Where(t => !string.IsNullOrWhiteSpace(t))
                         .Distinct()
                         .ToList();
 
                     foreach (var name in tags) {
+                        var key = name.ToLowerInvariant();
                        
-                        var tagEntity = await context.Tags.FirstOrDefaultAsync(n => n.Name == name);
-                        if (tagEntity == null) {
+                        if (!tagsDict.TryGetValue(key, out var tagEntity)) {
                             tagEntity = new TagEntity() { Name = name };
                             context.Tags.Add(tagEntity);
+                            tagsDict[key] = tagEntity;
                         }
                         context.CatTags.Add(new CatTagEntity() { Cat = catEntity, Tag = tagEntity }); 
                     }
@@ -56,7 +63,7 @@ namespace Obtain_25_Cat_Images.Services {
                 return Result.Ok(mapper.Map<List<CatResponseDTO>>(catEntityList));
             }
             catch (Exception ex) {
-                Console.WriteLine($"[Error] Method: FetchAndSaveCatsAsync() -> Exception thrown {ex.Message}");
+                Console.WriteLine($"[Error] {nameof(FetchAndSaveCatsAsync)} -> Exception thrown {ex.Message}");
                 return Result.Fail("An error occured please check you internet connection");
             }
 
@@ -78,32 +85,39 @@ namespace Obtain_25_Cat_Images.Services {
                 return Result.Ok(mapper.Map<CatResponseDTO>(cat));
             }
             catch (Exception ex) {
-                Console.WriteLine($"[Error] Method: GetCatByIdAsync(Id) -> Exception thrown {ex.Message}");
+                Console.WriteLine($"[Error] {nameof(GetCatByIdAsync)} -> Exception thrown {ex.Message}");
                 return Result.Fail("An error occured please check you internet connection");
             }
         }
 
         public async Task<Result<List<CatResponseDTO>>> GetCatsAsync(string? tag = null, int page = 1, int pageSize = 10) {
-            var query = context.Cats
-                .Include(ct => ct.CatTags)
-                .ThenInclude(t => t.Tag)
-                .AsQueryable();
 
-            if (tag != null) {
-                query = query.Where(ct => ct.CatTags.Any(t => t.Tag.Name == tag));
+            try {
+                var query = context.Cats
+                    .Include(ct => ct.CatTags)
+                    .ThenInclude(t => t.Tag)
+                    .AsQueryable();
+
+                if (tag != null) {
+                    query = query.Where(ct => ct.CatTags.Any(t => t.Tag.Name == tag));
+                }
+
+                var cats = await query
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+                if (cats.Count <= 0) {
+                    Console.WriteLine("[Error] There are no cats to return.");
+                    return Result.Fail("Cats not found");
+                }
+
+                return Result.Ok(mapper.Map<List<CatResponseDTO>>(cats));
             }
-
-            var cats = await query
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            if (cats.Count <= 0) {
-                Console.WriteLine("[Error] There are no cats to return.");
-                return Result.Fail("Cats not found");
+            catch (Exception ex) {
+                Console.WriteLine($"[Error] {nameof(GetCatsAsync)} -> Exception thrown {ex.Message}");
+                return Result.Fail("An error occured please check you internet connection");
             }
-
-            return Result.Ok(mapper.Map<List<CatResponseDTO>>(cats));
         }
     }
 }

@@ -12,7 +12,7 @@ using Obtain_25_Cat_Images.Data;
 namespace Obtain_25_Cat_Images.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250417180139_InitialCreate")]
+    [Migration("20250419162109_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
