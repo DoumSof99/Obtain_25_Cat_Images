@@ -6,6 +6,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>b5a79a83-5a31-4b44-98a5-27dd31a47dc1</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <DocumentationFile>D:\Projects\CODES\Visual_Studio_2022_C#_Porjects\Obtain_25_Cat_Images\Obtain_25_Cat_Images\Obtain_25_Cat_Images\bin\Debug\net8.0\Obtain_25_Cat_Images.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
