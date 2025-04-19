@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -211,6 +212,135 @@ namespace Obtain_25_Cats_Tests.Services {
 
             result.IsFailed.Should().BeTrue();
             result.Errors.Should().Contain(e => e.Message.Equals("Cat not found"));
+        }
+        #endregion
+
+        #region GetCatsAsync()
+        [Fact]
+        public async Task GetCatsAsync_Should_Return_Cats_Paginated() {
+            
+            var db = GetInMemoryDbContext();
+            for (int i = 1; i <= 20; i++) {
+
+                db.Cats.Add(new() {
+                    Id = i,
+                    CatId = $"Cat{i}",
+                    Image = $"https://cat{i}.jpg",
+                    Width = 300,
+                    Height = 200,
+                    CatTags = [
+                        new() { Tag = new() { Name = $"Playful{i}" } },
+                        new() { Tag = new() { Name = $"Independent{i}" }
+                        }
+                    ]
+                });
+            }
+            await db.SaveChangesAsync();
+
+            var service = new CatService(db, _mapper, new HttpClient());
+
+            var result1 = await service.GetCatsAsync(null, page: 2, pageSize: 5);
+
+            result1.IsSuccess.Should().BeTrue();
+            result1.Value.Should().HaveCount(5);
+            result1.Value.First().Id.Should().Be("Cat6");
+            result1.Value.First().Image.Should().Be("https://cat6.jpg");
+
+            var count1 = 6;
+            foreach (var cat in result1.Value) {
+                cat.Id.Should().Be($"Cat{count1}");
+                cat.Image.Should().Be($"https://cat{count1}.jpg");
+                cat.Tags.Select(t => t.Name).Should().BeEquivalentTo(
+                    $"Playful{count1}", $"Independent{count1}"
+                );
+                count1++;
+            }
+
+            var result2 = await service.GetCatsAsync(null, page: 5, pageSize: 4);
+
+            result2.IsSuccess.Should().BeTrue();
+            result2.Value.Should().HaveCount(4);
+            result2.Value.First().Id.Should().Be("Cat17");
+            result2.Value.First().Image.Should().Be("https://cat17.jpg");
+
+            var count2 = 17;
+            foreach (var cat in result2.Value) {
+                cat.Id.Should().Be($"Cat{count2}");
+                cat.Image.Should().Be($"https://cat{count2}.jpg");
+                cat.Tags.Select(t => t.Name).Should().BeEquivalentTo(
+                    $"Playful{count2}", $"Independent{count2}"
+                );
+                count2++;
+            }
+        }
+
+        [Fact]
+        public async Task GetCatsAsync_Should_Fail_If_No_Cats_Found() {
+            
+            var db = GetInMemoryDbContext();
+            var service = new CatService(db, _mapper, new HttpClient());
+            
+            var result = await service.GetCatsAsync();
+
+            result.IsFailed.Should().BeTrue();
+            result.Errors[0].Message.Should().Be("Cats not found");
+        }
+
+        [Fact]
+        public async Task GetCatsAsync_Should_Filter_By_Tag() {
+            
+            var db = GetInMemoryDbContext();
+
+            var playfulCat = new CatEntity {
+                CatId = "PlayfulId",
+                Image = "http://Playful.jpg",
+                CatTags = [new() { Tag = new() { Name = "Playful" } }]
+            };
+
+            var independentCat = new CatEntity {
+                CatId = "IndependentId",
+                Image = "http://Independent.jpg",
+                CatTags = [new() { Tag = new() { Name = "Independent" } }]
+            };
+
+            var bothCat = new CatEntity {
+                CatId = "BothId",
+                Image = "http://Both.jpg",
+                CatTags = [
+                    new() { Tag = new() { Name = "Independent" } },
+                    new() { Tag = new() { Name = "Playful" } },
+                    new() { Tag = new() { Name = "Active" } },
+                ]
+            };
+
+            var EmptyTagCat = new CatEntity {
+                CatId = "EmptyId",
+                Image = "http://Empty.jpg",
+                CatTags = [new() { Tag = new() { Name = "" } }]
+            };
+
+            db.Cats.AddRange(playfulCat, independentCat, bothCat, EmptyTagCat);
+            await db.SaveChangesAsync();
+
+            var service = new CatService(db, _mapper, new HttpClient());
+
+            var result1 = await service.GetCatsAsync(tag: "Active");
+
+            result1.IsSuccess.Should().BeTrue();
+            result1.Value.Should().ContainSingle();
+            result1.Value.Single().Id.Should().Be("BothId");
+
+            var result2 = await service.GetCatsAsync(tag: "Playful");
+
+            result2.IsSuccess.Should().BeTrue();
+            result2.Value.Should().HaveCount(2);
+            result2.Value.Select(c => c.Id).Should().BeEquivalentTo("PlayfulId", "BothId");
+
+            var result3 = await service.GetCatsAsync(tag: "Independent");
+
+            result3.IsSuccess.Should().BeTrue();
+            result3.Value.Should().HaveCount(2);
+            result3.Value.Select(c => c.Id).Should().BeEquivalentTo("IndependentId", "BothId");
         }
 
 
