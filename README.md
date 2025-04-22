@@ -28,6 +28,17 @@ Server: localhost,1433
 User: sa  
 Password: Password1!
 ```
+### 3. Apply the XML file for API Documentation:
+- In the path ..\Obtain_25_Cat_Images\XML file, there is a file: _Obtain_25_Cat_Images.xml_
+- Cut this and paste it in this path: ..\Obtain_25_Cat_Images\bin\Debug\net8.0
+- Then in Visual Studio, go to -> Project -> Obtain_25_Cat_Images Properties -> Build, and find the properties:
+```bash
+- Documentation file: check
+- XML Documentation file path, and select this path: ..\Obtain_25_Cat_Images\bin\Debug\net8.0\Obtain_25_Cat_Images.xml
+```
+**- It should look like this:**
+![image](https://github.com/user-attachments/assets/f43202e3-87eb-4363-9e42-49c838b0862c)
+
 ### 3. Apply Database Migrations
 - In Visual Studio, use the .NET CLI to apply EF Core migrations and create the schema:
 ```bash
@@ -35,14 +46,24 @@ Password: Password1!
 - dotnet ef database update
 ```
 :globe_with_meridians: _This creates a database named **CatDb** with the required tables._
+
+:warning: If this error occurred: 
+```bash
+Could not execute because the specified command or file was not found
+```
+- First, run this command and try again:
+```bash
+dotnet tool install --global dotnet-ef
+```
 ### 4. Add Your TheCatAPI Key
 - In the CLI of Visual Studio, _cd_ to the path that the file _appsettings.Development.template.json_ exists and run:
 ```bash
 cp .\appsettings.Development.template.json .\appsettings.Development.json
 ```
 1. A new file will be generated: _appsettings.Development.json_
-2. Then visit the site: _https://developers.thecatapi.com/view-account/ylX4blBYT9FaoVd6OhvR?report=FJkYOq9tW_
-3. Follow steps 1 and 2. Then copy your _ApiKey_ and place it in the _appsettings.Development.json_, where it says **<YOUR_API_KEY>**
+2. Then visit the site: _https://developers.thecatapi.com/view-account/ylX4blBYT9FaoVd6OhvR?report=bOoHBz-8t_
+3. Then go to **Start Here** section.
+4. Follow steps 1 and 2. Then copy your _ApiKey_ and place it in the _appsettings.Development.json_, where it says **<YOUR_API_KEY>**
 ### 5. Run the Web API
 - Make sure you're inside the root of the project _(where .csproj is)_, then run:
 ```bash
