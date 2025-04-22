@@ -1,5 +1,6 @@
 ﻿using FluentResults;
 using Microsoft.AspNetCore.Mvc;
+using Obtain_25_Cat_Images.DTOs;
 using Obtain_25_Cat_Images.Interfaces;
 
 namespace Obtain_25_Cat_Images.Controllers {
@@ -16,6 +17,8 @@ namespace Obtain_25_Cat_Images.Controllers {
         /// <response code="200">Returns the list of cats</response>
         /// <response code="500">If the external API fails or saving to the DB fails</response>
         [HttpPost("fetch")]
+        [ProducesResponseType(typeof(List<CatResponseDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> FetchAndSaveCats() {
             var result = await catService.FetchAndSaveCatsAsync();
 
@@ -34,6 +37,9 @@ namespace Obtain_25_Cat_Images.Controllers {
         /// <response code="404">Returns a 404 if the cat is not found</response>
         /// <response code="400">Returns a 400 if there was a request error</response>
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(CatResponseDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetCatById(int id) {
             var result = await catService.GetCatByIdAsync(id);
 
@@ -52,6 +58,8 @@ namespace Obtain_25_Cat_Images.Controllers {
         /// <response code="200">Returns the list of cats</response>
         /// <response code="404">No cats found</response>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetCats([FromQuery] string? tag, [FromQuery] int page = 1, [FromQuery] int pageSize = 10) {
             var result = await catService.GetCatsAsync(tag, page, pageSize);
 
