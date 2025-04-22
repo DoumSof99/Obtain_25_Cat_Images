@@ -64,18 +64,18 @@ cp .\appsettings.Development.template.json .\appsettings.Development.json
 2. Then visit the site: _https://developers.thecatapi.com/view-account/ylX4blBYT9FaoVd6OhvR?report=bOoHBz-8t_
 3. Then go to **Start Here** section.
 4. Follow steps 1 and 2. Then copy your _ApiKey_ and place it in the _appsettings.Development.json_, where it says **<YOUR_API_KEY>**
-### 5. Run the Web API
+### 6. Run the Web API
 - Make sure you're inside the root of the project _(where .csproj is)_, then run:
 ```bash
 dotnet run
 ```
 - This will start the Web API. Once the app is running, open your browser and navigate to: **_http://localhost:<your_port>/swagger_**
 - Example: If it says Now listening on _http://localhost:5072_, go to: _http://localhost:5072/swagger_
-### 6. Available API Endpoints (Swagger)
+### 7. Available API Endpoints (Swagger)
 - POST /api/cats/fetch  -> Fetches 25 cat images with breed info from TheCatAPI and stores them into the local database.
 - GET /api/cats         -> Returns a list of cats stored in the database, supports pagination and filtering by temperament tag.
 - GET /api/cats/{id}    -> Returns a single cat by its internal DB ID (not CatAPI's ID).
-### 7. Running Unit & Integration Tests
+### 8. Running Unit & Integration Tests
 - To run all tests (unit + integration), navigate to the Test Explorer in VS, and run all the tests:
 ![image](https://github.com/user-attachments/assets/12c04299-2e9c-4b23-a49c-e919fe4f1879)
 
