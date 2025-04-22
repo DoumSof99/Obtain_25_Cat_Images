@@ -39,7 +39,7 @@ Password: Password1!
 **- It should look like this:**
 ![image](https://github.com/user-attachments/assets/f43202e3-87eb-4363-9e42-49c838b0862c)
 
-### 3. Apply Database Migrations
+### 4. Apply Database Migrations
 - In Visual Studio, use the .NET CLI to apply EF Core migrations and create the schema:
 ```bash
 - dotnet build
@@ -55,7 +55,7 @@ Could not execute because the specified command or file was not found
 ```bash
 dotnet tool install --global dotnet-ef
 ```
-### 4. Add Your TheCatAPI Key
+### 5. Add Your TheCatAPI Key
 - In the CLI of Visual Studio, _cd_ to the path that the file _appsettings.Development.template.json_ exists and run:
 ```bash
 cp .\appsettings.Development.template.json .\appsettings.Development.json
