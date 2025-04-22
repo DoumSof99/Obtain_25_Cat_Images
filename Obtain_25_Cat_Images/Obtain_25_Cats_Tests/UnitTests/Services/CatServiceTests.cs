@@ -11,27 +11,33 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 
-namespace Obtain_25_Cats_Tests.Services {
-    public class CatServiceTests {
+namespace Obtain_25_Cats_Tests.UnitTests.Services
+{
+    public class CatServiceTests
+    {
 
         #region Mock Data
         private readonly IMapper _mapper;
 
-        public CatServiceTests() {
-            var config = new MapperConfiguration(mc => {
+        public CatServiceTests()
+        {
+            var config = new MapperConfiguration(mc =>
+            {
                 mc.AddMaps("Obtain_25_Cat_Images");
             });
             _mapper = config.CreateMapper();
         }
 
-        private static AppDbContext GetInMemoryDbContext() {
+        private static AppDbContext GetInMemoryDbContext()
+        {
             var options = new DbContextOptionsBuilder<AppDbContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString())
                 .Options;
             return new AppDbContext(options);
         }
 
-        private static HttpClient GetMockHttpClient<T>(T mockData) {
+        private static HttpClient GetMockHttpClient<T>(T mockData)
+        {
             var json = JsonSerializer.Serialize(mockData);
             var msgHandlerMock = new Mock<HttpMessageHandler>();
 
@@ -40,12 +46,14 @@ namespace Obtain_25_Cats_Tests.Services {
                 .Setup<Task<HttpResponseMessage>>("SendAsync",
                     ItExpr.IsAny<HttpRequestMessage>(),
                     ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(new HttpResponseMessage {
+                .ReturnsAsync(new HttpResponseMessage
+                {
                     StatusCode = HttpStatusCode.OK,
                     Content = new StringContent(json, Encoding.UTF8, "application/json")
                 });
 
-            return new HttpClient(msgHandlerMock.Object) {
+            return new HttpClient(msgHandlerMock.Object)
+            {
                 BaseAddress = new Uri("https://api.thecatapi.com/")
             };
         }
@@ -55,7 +63,8 @@ namespace Obtain_25_Cats_Tests.Services {
         #region Tests for FetchAndSaveCatsAsync()
 
         [Fact]
-        public async Task FetchAndSaveCatsAsync_Valid_Save_Cats_And_Tags() {
+        public async Task FetchAndSaveCatsAsync_Valid_Save_Cats_And_Tags()
+        {
             var db = GetInMemoryDbContext();
             var mockApiCats = new List<CatApiResponseDTO> {
                 new() {
@@ -106,7 +115,8 @@ namespace Obtain_25_Cats_Tests.Services {
         }
 
         [Fact]
-        public async Task FetchAndSaveCatsAsync_Should_Ignore_Duplicates_Cats() {
+        public async Task FetchAndSaveCatsAsync_Should_Ignore_Duplicates_Cats()
+        {
             var db = GetInMemoryDbContext();
             db.Cats.Add(new CatEntity { Id = 1, CatId = "CatId1", Image = "image234.jpg", Width = 300, Height = 120 });
             db.SaveChanges();
@@ -124,10 +134,11 @@ namespace Obtain_25_Cats_Tests.Services {
         }
 
         [Fact]
-        public async Task FetchAndSaveCatsAsync_Should_Fail_If_Response_Is_Null() {
+        public async Task FetchAndSaveCatsAsync_Should_Fail_If_Response_Is_Null()
+        {
 
             var db = GetInMemoryDbContext();
-           
+
             var httpClient = GetMockHttpClient<List<CatApiResponseDTO>>(null!);
             var service = new CatService(db, _mapper, httpClient);
 
@@ -137,12 +148,11 @@ namespace Obtain_25_Cats_Tests.Services {
         }
 
         [Fact]
-        public async Task FetchAndSaveCatsAsync_Should_Have_Tags_With_Empty_Name() {
+        public async Task FetchAndSaveCatsAsync_Should_Have_Tags_With_Empty_Name()
+        {
             var db = GetInMemoryDbContext();
-            var fakeApiCats = new List<CatApiResponseDTO>
-            {
-                new()
-                {
+            var fakeApiCats = new List<CatApiResponseDTO> {
+                new() {
                     Id = "cat_no_tags",
                     Url = "img.jpg",
                     Width = 300,
@@ -160,15 +170,119 @@ namespace Obtain_25_Cats_Tests.Services {
             result.Value.Should().NotBeNull();
             result.Value.Single().Tags.Should().BeEmpty();
         }
+
+        [Fact]
+        public async Task FetchAndSaveCatsAsync_Should_Handle_Tag_Whitespace()
+        {
+            var db = GetInMemoryDbContext();
+            var mockApiCats = new List<CatApiResponseDTO> {
+                new() {
+                    Id = "sjd7Ss",
+                    Url = "https://img.jpg",
+                    Width = 300,
+                    Height = 300,
+                    Breeds = [new() { Temperament = "  Playful ,  Independent  , ,  " }]
+                }
+            };
+            var httpClient = GetMockHttpClient(mockApiCats);
+
+            var service = new CatService(db, _mapper, httpClient);
+            var result = await service.FetchAndSaveCatsAsync();
+
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().ContainSingle();
+
+            var cat = result.Value.Single();
+            cat.Id.Should().Be("sjd7Ss");
+            cat.Tags.Select(p => p.Name).Should().BeEquivalentTo("Playful", "Independent");
+        }
+
+        [Fact]
+        public async Task FetchAndSaveCatsAsync_Should_Ignore_Duplicate_Tag_Names()
+        {
+            var db = GetInMemoryDbContext();
+            var mockApiCats = new List<CatApiResponseDTO> {
+                new() {
+                    Id = "dH7sS",
+                    Url = "https://imagedH7sS.jpg",
+                    Width = 600,
+                    Height = 400,
+                    Breeds = [
+                        new() { Temperament = "Playful, Active, Active, Playful, Independent" }
+                    ]
+                }
+            };
+
+            var httpClient = GetMockHttpClient(mockApiCats);
+            var service = new CatService(db, _mapper, httpClient);
+
+            var result = await service.FetchAndSaveCatsAsync();
+
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().ContainSingle();
+
+            var cat = result.Value.Single();
+            cat.Id.Should().Be("dH7sS");
+
+            cat.Tags.Should().HaveCount(3);
+            cat.Tags.Select(t => t.Name).Should().BeEquivalentTo("Active", "Playful", "Independent");
+        }
+
+        [Fact]
+        public async Task FetchAndSaveCatsAsync_Should_Persist_Tags_Correctly_When_Have_Multiple_Cats()
+        {
+            var db = GetInMemoryDbContext();
+            var mockApiCats = new List<CatApiResponseDTO> {
+                new() {
+                    Id = "cat1",
+                    Url = "https://imagescat1.jpg",
+                    Width = 600,
+                    Height = 400,
+                    Breeds = [
+                        new() { Temperament = "Active, Independent" }
+                    ]
+                },
+                new() {
+                    Id = "cat2",
+                    Url = "https://imagecat2.jpg",
+                    Width = 640,
+                    Height = 360,
+                    Breeds = [
+                        new() { Temperament = "Active, Playful" }
+                    ]
+                }
+            };
+
+            var httpClient = GetMockHttpClient(mockApiCats);
+            var service = new CatService(db, _mapper, httpClient);
+
+            var result = await service.FetchAndSaveCatsAsync();
+
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().HaveCount(2);
+
+            var cat1Tags = result.Value.First(c => c.Id == "cat1").Tags.Select(t => t.Name);
+            var cat2Tags = result.Value.First(c => c.Id == "cat2").Tags.Select(t => t.Name);
+
+            cat1Tags.Should().BeEquivalentTo("Active", "Independent");
+            cat2Tags.Should().BeEquivalentTo("Active", "Playful");
+
+            var allTags = db.Tags.ToList();
+            allTags.Should().HaveCount(3);
+            allTags.Select(t => t.Name).Should().BeEquivalentTo("Active", "Independent", "Playful");
+        }
+
         #endregion
 
         #region GetCatByIdAsync()
 
         [Fact]
-        public async Task GetCatByIdAsync_Cat_Exists_Should_Return_DTO() {
+        public async Task GetCatByIdAsync_Cat_Exists_Should_Return_DTO()
+        {
 
             var db = GetInMemoryDbContext();
-            var cat = new CatEntity {
+            var cat = new CatEntity
+            {
                 Id = 1,
                 CatId = "Cat01",
                 Width = 400,
@@ -198,12 +312,13 @@ namespace Obtain_25_Cats_Tests.Services {
         }
 
         [Fact]
-        public async Task GetCatByIdAsync_Cat_Not_Exist_Should_Fail() {
-            
+        public async Task GetCatByIdAsync_Cat_Not_Exist_Should_Fail()
+        {
+
             var db = GetInMemoryDbContext();
             var service = new CatService(db, _mapper, new HttpClient());
 
-            var result = await service.GetCatByIdAsync(1); 
+            var result = await service.GetCatByIdAsync(1);
 
             result.IsFailed.Should().BeTrue();
             result.Errors.Should().Contain(e => e.Message.Equals("Cat not found"));
@@ -212,12 +327,15 @@ namespace Obtain_25_Cats_Tests.Services {
 
         #region GetCatsAsync()
         [Fact]
-        public async Task GetCatsAsync_Should_Return_Cats_Paginated() {
-            
-            var db = GetInMemoryDbContext();
-            for (int i = 1; i <= 20; i++) {
+        public async Task GetCatsAsync_Should_Return_Cats_Paginated()
+        {
 
-                db.Cats.Add(new() {
+            var db = GetInMemoryDbContext();
+            for (int i = 1; i <= 20; i++)
+            {
+
+                db.Cats.Add(new()
+                {
                     Id = i,
                     CatId = $"Cat{i}",
                     Image = $"https://cat{i}.jpg",
@@ -242,7 +360,8 @@ namespace Obtain_25_Cats_Tests.Services {
             result1.Value.First().Image.Should().Be("https://cat6.jpg");
 
             var count1 = 6;
-            foreach (var cat in result1.Value) {
+            foreach (var cat in result1.Value)
+            {
                 cat.Id.Should().Be($"Cat{count1}");
                 cat.Image.Should().Be($"https://cat{count1}.jpg");
                 cat.Tags.Select(t => t.Name).Should().BeEquivalentTo(
@@ -259,7 +378,8 @@ namespace Obtain_25_Cats_Tests.Services {
             result2.Value.First().Image.Should().Be("https://cat17.jpg");
 
             var count2 = 17;
-            foreach (var cat in result2.Value) {
+            foreach (var cat in result2.Value)
+            {
                 cat.Id.Should().Be($"Cat{count2}");
                 cat.Image.Should().Be($"https://cat{count2}.jpg");
                 cat.Tags.Select(t => t.Name).Should().BeEquivalentTo(
@@ -270,11 +390,12 @@ namespace Obtain_25_Cats_Tests.Services {
         }
 
         [Fact]
-        public async Task GetCatsAsync_Should_Fail_If_No_Cats_Found() {
-            
+        public async Task GetCatsAsync_Should_Fail_If_No_Cats_Found()
+        {
+
             var db = GetInMemoryDbContext();
             var service = new CatService(db, _mapper, new HttpClient());
-            
+
             var result = await service.GetCatsAsync();
 
             result.IsFailed.Should().BeTrue();
@@ -282,23 +403,27 @@ namespace Obtain_25_Cats_Tests.Services {
         }
 
         [Fact]
-        public async Task GetCatsAsync_Should_Filter_By_Tag() {
-            
+        public async Task GetCatsAsync_Should_Filter_By_Tag()
+        {
+
             var db = GetInMemoryDbContext();
 
-            var playfulCat = new CatEntity {
+            var playfulCat = new CatEntity
+            {
                 CatId = "PlayfulId",
                 Image = "http://Playful.jpg",
                 CatTags = [new() { Tag = new() { Name = "Playful" } }]
             };
 
-            var independentCat = new CatEntity {
+            var independentCat = new CatEntity
+            {
                 CatId = "IndependentId",
                 Image = "http://Independent.jpg",
                 CatTags = [new() { Tag = new() { Name = "Independent" } }]
             };
 
-            var bothCat = new CatEntity {
+            var bothCat = new CatEntity
+            {
                 CatId = "BothId",
                 Image = "http://Both.jpg",
                 CatTags = [
@@ -308,7 +433,8 @@ namespace Obtain_25_Cats_Tests.Services {
                 ]
             };
 
-            var EmptyTagCat = new CatEntity {
+            var EmptyTagCat = new CatEntity
+            {
                 CatId = "EmptyId",
                 Image = "http://Empty.jpg",
                 CatTags = [new() { Tag = new() { Name = "" } }]

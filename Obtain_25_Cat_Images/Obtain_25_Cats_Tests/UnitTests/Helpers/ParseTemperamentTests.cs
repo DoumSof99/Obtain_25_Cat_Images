@@ -1,6 +1,6 @@
 using Obtain_25_Cat_Images.Helpers;
 
-namespace Obtain_25_Cats_Tests.Helpers
+namespace Obtain_25_Cats_Tests.UnitTests.Helpers
 {
     public class ParseTemperamentTests
     {
