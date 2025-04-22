@@ -44,7 +44,7 @@ cp .\appsettings.Development.template.json .\appsettings.Development.json
 2. Then visit the site: _https://developers.thecatapi.com/view-account/ylX4blBYT9FaoVd6OhvR?report=FJkYOq9tW_
 3. Follow steps 1 and 2. Then copy your _ApiKey_ and place it in the _appsettings.Development.json_, where it says **<YOUR_API_KEY>**
 ### 5. Run the Web API
-- Make sure you're inside the root of the project _(where .csproj and Program.cs are)_, then run:
+- Make sure you're inside the root of the project _(where .csproj is)_, then run:
 ```bash
 dotnet run
 ```
