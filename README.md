@@ -35,6 +35,7 @@ Password: Password1!
 ```bash
 - Documentation file: **check it**
 - XML Documentation file path, and select this path (where you placed the _Obtain_25_Cat_Images.xml_ file): ..\ROOT\Obtain_25_Cat_Images\Obtain_25_Cat_Images\bin\Debug\net8.0\Obtain_25_Cat_Images.xml
+- **Save**
 ```
 **- It should look like this:**
 ![image](https://github.com/user-attachments/assets/f43202e3-87eb-4363-9e42-49c838b0862c)
