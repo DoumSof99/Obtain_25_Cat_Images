@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Obtain_25_Cat_Images</name>
+    </assembly>
+    <members>
+        <member name="M:Obtain_25_Cat_Images.Controllers.CatsController.FetchAndSaveCats">
+            <summary>
+            Fetches 25 cat images with breed information and stores them in the database.
+            </summary>
+            <remarks>
+            This endpoint contacts TheCatAPI (https://thecatapi.com), extracts image + temperament data,
+            and stores cats with tag relations in SQL Server.
+            </remarks>
+            <returns>List of newly saved cat records</returns>
+            <response code="200">Returns the list of cats</response>
+            <response code="500">If the external API fails or saving to the DB fails</response>
+        </member>
+        <member name="M:Obtain_25_Cat_Images.Controllers.CatsController.GetCatById(System.Int32)">
+            <summary>
+            Retrieves a single cat by its database ID.
+            </summary>
+            <param name="id">The internal database ID of the cat.</param>
+            <returns>
+            </returns>
+            <response code="200">Returns the cat if found</response>
+            <response code="404">Returns a 404 if the cat is not found</response>
+            <response code="400">Returns a 400 if there was a request error</response>
+        </member>
+        <member name="M:Obtain_25_Cat_Images.Controllers.CatsController.GetCats(System.String,System.Int32,System.Int32)">
+            <summary>
+            Returns a list of cats with optional tag filter and pagination.
+            </summary>
+            <param name="tag">Optional tag name to filter cats by.</param>
+            <param name="page">The page number.</param>
+            <param name="pageSize">Number of results per page.</param>
+            <returns>A paginated list of cats.</returns>
+            <response code="200">Returns the list of cats</response>
+            <response code="404">No cats found</response>
+        </member>
+        <member name="T:Obtain_25_Cat_Images.Migrations.InitialCreate">
+            <inheritdoc />
+        </member>
+        <member name="M:Obtain_25_Cat_Images.Migrations.InitialCreate.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:Obtain_25_Cat_Images.Migrations.InitialCreate.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:Obtain_25_Cat_Images.Migrations.InitialCreate.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+    </members>
+</doc>
