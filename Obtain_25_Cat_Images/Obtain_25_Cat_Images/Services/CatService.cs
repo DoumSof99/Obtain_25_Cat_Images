@@ -98,8 +98,8 @@ namespace Obtain_25_Cat_Images.Services {
                     .ThenInclude(t => t.Tag)
                     .AsQueryable();
 
-                if (tag != null) {
-                    query = query.Where(ct => ct.CatTags.Any(t => t.Tag.Name == tag));
+                if (!string.IsNullOrWhiteSpace(tag)) {
+                    query = query.Where(ct => ct.CatTags.Any(t => t.Tag.Name.ToLower() == tag.ToLower()));
                 }
 
                 var cats = await query
