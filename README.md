@@ -50,3 +50,18 @@ dotnet run
 ```
 - This will start the Web API. Once the app is running, open your browser and navigate to: **_http://localhost:<your_port>/swagger_**
 - Example: If it says Now listening on _http://localhost:5072_, go to: _http://localhost:5072/swagger_
+### 6. Available API Endpoints (Swagger)
+- POST /api/cats/fetch  -> Fetches 25 cat images with breed info from TheCatAPI and stores them into the local database.
+- GET /api/cats         -> Returns a list of cats stored in the database, supports pagination and filtering by temperament tag.
+- GET /api/cats/{id}    -> Returns a single cat by its internal DB ID (not CatAPI's ID).
+### 7. Running Unit & Integration Tests
+- To run all tests (unit + integration), navigate to the Test Explorer in VS, and run all the tests:
+![image](https://github.com/user-attachments/assets/12c04299-2e9c-4b23-a49c-e919fe4f1879)
+
+## :dart: Troubleshooting Tips:
+- Make sure your Docker container is running when testing endpoints that interact with the database.
+- If you see database-related errors during tests, ensure migrations are applied correctly with:
+```bash
+dotnet ef database update
+```
+- If the API key is missing, the fetch endpoint will fail. Ensure your appsettings.Development.json contains a valid key.
