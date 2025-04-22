@@ -10,6 +10,7 @@ namespace Obtain_25_Cats_Tests.IntegrationTests {
         private readonly IServiceProvider _services;
 
         public CatsControllerTests(CustomWebApplicationFactory<Program> factory) {
+            CustomWebApplicationFactory<Program>.TestDbName = Guid.NewGuid().ToString();
             _httpClient = factory.CreateClient();
             _services = factory.Services;
         }
@@ -64,6 +65,7 @@ namespace Obtain_25_Cats_Tests.IntegrationTests {
 
             db.Cats.AddRange(
                 new CatEntity {
+                    Id = 44445,
                     CatId = "Cat1",
                     Image = "img1.jpg",
                     CatTags = [
@@ -72,6 +74,7 @@ namespace Obtain_25_Cats_Tests.IntegrationTests {
                     ]
                 },
                 new CatEntity {
+                    Id=44446,
                     CatId = "Cat2",
                     Image = "img2.jpg",
                     CatTags = [

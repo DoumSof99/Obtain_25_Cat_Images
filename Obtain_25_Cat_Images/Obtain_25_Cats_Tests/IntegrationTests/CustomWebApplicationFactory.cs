@@ -13,6 +13,8 @@ namespace Obtain_25_Cats_Tests.IntegrationTests {
 
     // This custom factory overrides the DB and config
     public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram> where TProgram : class {
+        public static string TestDbName { get; set; } = Guid.NewGuid().ToString();
+      
         protected override void ConfigureWebHost(IWebHostBuilder builder) {
             builder.ConfigureServices(services => {
                 var descriptor = services.SingleOrDefault(
@@ -21,7 +23,7 @@ namespace Obtain_25_Cats_Tests.IntegrationTests {
                 if (descriptor != null) services.Remove(descriptor);
 
                 services.AddDbContext<AppDbContext>(options =>
-                    options.UseInMemoryDatabase("TestDb"));
+                    options.UseInMemoryDatabase(TestDbName));
 
                 var sp = services.BuildServiceProvider();
                 using var scope = sp.CreateScope();
