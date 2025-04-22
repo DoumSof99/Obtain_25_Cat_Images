@@ -29,12 +29,12 @@ User: sa
 Password: Password1!
 ```
 ### 3. Apply the XML file for API Documentation:
-- In the path ..\Obtain_25_Cat_Images\XML file, there is a file: _Obtain_25_Cat_Images.xml_
-- Cut this and paste it in this path: ..\Obtain_25_Cat_Images\bin\Debug\net8.0
-- Then in Visual Studio, go to -> Project -> Obtain_25_Cat_Images Properties -> Build, and find the properties:
+- In the path _ROOT\Obtain_25_Cat_Images\XML file_, there is a file with name: _Obtain_25_Cat_Images.xml_
+- Copy this and paste it to this path: ROOT\Obtain_25_Cat_Images\Obtain_25_Cat_Images\bin\Debug\net8.0
+- Then in **Visual Studio**, go to -> Project -> Obtain_25_Cat_Images Properties -> Build, and find the properties:
 ```bash
-- Documentation file: check
-- XML Documentation file path, and select this path: ..\Obtain_25_Cat_Images\bin\Debug\net8.0\Obtain_25_Cat_Images.xml
+- Documentation file: **check it**
+- XML Documentation file path, and select this path (where you placed the _Obtain_25_Cat_Images.xml_ file): ..\ROOT\Obtain_25_Cat_Images\Obtain_25_Cat_Images\bin\Debug\net8.0\Obtain_25_Cat_Images.xml
 ```
 **- It should look like this:**
 ![image](https://github.com/user-attachments/assets/f43202e3-87eb-4363-9e42-49c838b0862c)
@@ -43,6 +43,7 @@ Password: Password1!
 - In Visual Studio, use the .NET CLI to apply EF Core migrations and create the schema:
 ```bash
 - dotnet build
+- cd Obtain_25_Cat_Images
 - dotnet ef database update
 ```
 :globe_with_meridians: _This creates a database named **CatDb** with the required tables._
